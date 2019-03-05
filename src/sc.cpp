@@ -21,6 +21,16 @@
 #define LOG_PERIOD_S 		10
 #define NODE_NAME 			"sc"
 
+bool isMono(const ST::ColorFrame &visFrame)
+{
+	return visFrame.width() * visFrame.height() == visFrame.rgbSize();
+}
+
+std::string getEncoding(const ST::ColorFrame &visFrame)
+{
+	return isMono(visFrame) ? sensor_msgs::image_encodings::MONO8 : sensor_msgs::image_encodings::RGB8;
+}
+
 struct SessionDelegate : ST::CaptureSessionDelegate {
 private:
     std::mutex lock;
@@ -198,25 +208,16 @@ public:
 			return;
 		}
 
-		cv::Mat img(visFrame.height(), visFrame.width(), CV_8UC1);
+		const std::string encoding = getEncoding(visFrame);
 
-		const uint8_t* buf = visFrame.rgbData();
-
-		for(int y = 0; y < visFrame.height(); y++)
-		{
-			for(int x = 0; x < visFrame.width(); x++)
-			{
-				std::size_t pixelOffset = (y * visFrame.width()) + x;
-				img.at<uchar>(y, x) = buf[pixelOffset];
-			}
-		}
+		cv::Mat img(visFrame.height(), visFrame.width(), cv_bridge::getCvType(encoding), static_cast<void*>(const_cast<uint8_t*>(visFrame.rgbData())));
 
 		std_msgs::Header header;
 		header.frame_id = frame_id_;
 		// TODO: convert timstamp to ROS time
 		// header.stamp =  infraredFrame.timestamp();
 
-		sensor_msgs::ImagePtr msg = cv_bridge::CvImage(header, "mono8", img).toImageMsg();
+		sensor_msgs::ImagePtr msg = cv_bridge::CvImage(header, encoding, img).toImageMsg();
 		vis_pub_.publish(msg);
 
 		sensor_msgs::CameraInfo cam_info;
