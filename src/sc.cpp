@@ -351,6 +351,8 @@ private:
 
 	bool imu_enable_;
 
+	bool depth_correction_enable_;
+
 	SessionDelegate *delegate_ = nullptr;
 	ST::CaptureSessionSettings sessionConfig_;
 	ST::CaptureSession captureSession_;
@@ -374,6 +376,9 @@ public:
 		ros::param::param<bool>("~imu_enable", imu_enable_, false);
 		ROS_INFO_STREAM(NODE_NAME << ": imu_enable = " << imu_enable_);
 
+		ros::param::param<bool>("~depth_correction_enable", depth_correction_enable_, false);
+		ROS_INFO_STREAM(NODE_NAME << ": depth_correction_enable = " << depth_correction_enable_);
+
 		std::string frame_id;
 		ros::param::param<std::string>("~frame_id", frame_id, DEFAULT_FRAME_ID);
 		ROS_INFO_STREAM(NODE_NAME << ": frame_id = " << frame_id);
@@ -393,6 +398,7 @@ public:
 
 		sessionConfig_.source = ST::CaptureSessionSourceId::StructureCore;
 		sessionConfig_.structureCore = scConfig;
+		sessionConfig_.applyExpensiveCorrection = depth_correction_enable_;
 
 		delegate_ = new SessionDelegate(nh_, frame_id, sessionConfig_);
 		captureSession_.setDelegate(delegate_);
