@@ -238,7 +238,7 @@ public:
 			for(int x = 0; x < depthFrame.width(); x++)
 			{
 				std::size_t pixelOffset = (y * depthFrame.width()) + x;
-				img.at<float>(y, x) = buf[pixelOffset];
+				img.at<float>(y, x) = buf[pixelOffset] * 0.001f;
 			}
 		}
 
