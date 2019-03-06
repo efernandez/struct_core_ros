@@ -177,8 +177,7 @@ public:
 
 		std_msgs::Header header;
 		header.frame_id = frame_id_;
-		// TODO: convert timstamp to ROS time
-		// header.stamp =  infraredFrame.timestamp();
+		header.stamp.fromSec(infraredFrame.timestamp());
 
 		sensor_msgs::ImagePtr msg = cv_bridge::CvImage(header, "mono8", img).toImageMsg();
 		ir_pub_.publish(msg);
@@ -213,8 +212,7 @@ public:
 
 		std_msgs::Header header;
 		header.frame_id = frame_id_;
-		// TODO: convert timstamp to ROS time
-		// header.stamp =  infraredFrame.timestamp();
+		header.stamp.fromSec(visFrame.timestamp());
 
 		sensor_msgs::ImagePtr msg = cv_bridge::CvImage(header, "mono8", img).toImageMsg();
 		vis_pub_.publish(msg);
@@ -244,8 +242,7 @@ public:
 
 		std_msgs::Header header;
 		header.frame_id = frame_id_;
-		// TODO: convert timstamp to ROS time
-		// header.stamp =  infraredFrame.timestamp();
+		header.stamp.fromSec(depthFrame.timestamp());
 
 		sensor_msgs::ImagePtr msg = cv_bridge::CvImage(header, sensor_msgs::image_encodings::TYPE_32FC1, img).toImageMsg();
 		depth_image_pub_.publish(msg);
@@ -257,8 +254,7 @@ public:
 
 	void sendIMU(double timestamp)
 	{
-		// TODO: convert timstamp to ROS time
-		// header.stamp =  timestamp();
+		imu_.header.stamp.fromSec(timestamp);
 		imu_.header.frame_id = frame_id_;
 
 		// TODO: fuse accel and gyro
